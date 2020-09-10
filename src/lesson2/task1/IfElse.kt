@@ -106,7 +106,15 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int =
+    when {
+        (kingX != rookX1) and (kingX != rookX2) and (kingY != rookY1) and (kingY != rookY2) -> 0
+        (kingX == rookX1) and (kingY != rookY2) and ((kingX != rookX2) or (kingX !in rookX1..rookX2)) -> 1
+        (kingX == rookX2) and (kingY != rookY1) and ((kingX != rookX1) or (kingX !in rookX1..rookX2)) -> 2
+        (kingY == rookY1) and (kingX != rookX2) and ((kingY != rookY2) or (kingY !in rookY1..rookY2)) -> 1
+        (kingY == rookY2) and (kingX != rookX1) and ((kingY != rookY1) or (kingY !in rookY1..rookY2)) -> 2
+        else -> 3
+    }
 
 /**
  * Простая (2 балла)
@@ -122,7 +130,12 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int = when {
+    ((kingX == rookX) or (kingY == rookY)) and ((kingX + kingY != bishopX + bishopY) and (kingX - kingY != bishopX - bishopY)) -> 1
+    ((kingX != rookX) and (kingY != rookY)) and ((kingX + kingY == bishopX + bishopY) or (kingX - kingY == bishopX - bishopY)) -> 2
+    ((kingX == rookX) or (kingY == rookY)) and ((kingX + kingY == bishopX + bishopY) or (kingX - kingY == bishopX - bishopY)) -> 3
+    else -> 0
+}
 
 /**
  * Простая (2 балла)
