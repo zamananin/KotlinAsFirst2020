@@ -113,7 +113,7 @@ fun whichRookThreatens(
         (kingX == rookX2) and (kingY != rookY1) and ((kingX != rookX1) or (kingX !in rookX1..rookX2)) -> 2
         (kingY == rookY1) and (kingX != rookX2) and ((kingY != rookY2) or (kingY !in rookY1..rookY2)) -> 1
         (kingY == rookY2) and (kingX != rookX1) and ((kingY != rookY1) or (kingY !in rookY1..rookY2)) -> 2
-        else -> 3
+        else ->  3
     }
 
 /**
