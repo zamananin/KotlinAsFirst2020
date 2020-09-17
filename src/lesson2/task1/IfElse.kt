@@ -87,10 +87,14 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = when {
-    t1 * v1 >= t2 * v2 + t3 * v3 -> (t1 * v1 + t2 * v2 + t3 * v3) / 2.0 / v1
-    t1 * v1 + t2 * v2 >= t3 * v3 -> t1 + (t1 * v1 * -1 + t2 * v2 + t3 * v3) / 2.0 / v2
-    else -> t1 + t2 + t3 - (t1 * v1 + t2 * v2 + t3 * v3) / 2.0 / v3
+): Double {
+    val s1 = t1 * v1
+    val s2 = t2 * v2
+    val s3 = t3 * v3
+    val s = (s1 + s2 + s3)
+    if (s1 >= s2 + s3) return s / 2.0 / v1
+    if (s1 + s2 >= s3) return t1 + (s - s1 * 2.0) / 2.0 / v2
+    return t1 + t2 + t3 - s / 2.0 / v3
 }
 
 /**
@@ -106,15 +110,20 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int =
-    when {
-        (kingX != rookX1) and (kingX != rookX2) and (kingY != rookY1) and (kingY != rookY2) -> 0
-        (kingX == rookX1) and (kingY != rookY2) and ((kingX != rookX2) or (kingX !in rookX1..rookX2)) -> 1
-        (kingX == rookX2) and (kingY != rookY1) and ((kingX != rookX1) or (kingX !in rookX1..rookX2)) -> 2
-        (kingY == rookY1) and (kingX != rookX2) and ((kingY != rookY2) or (kingY !in rookY1..rookY2)) -> 1
-        (kingY == rookY2) and (kingX != rookX1) and ((kingY != rookY1) or (kingY !in rookY1..rookY2)) -> 2
-        else -> 3
+): Int {
+    if (kingX == rookX1) {
+        if ((kingX == rookX2) && (kingY in rookY1..rookY2)) return 3
+        if (kingY != rookY2) return 1
+        return 3
     }
+    if (kingY == rookY1) {
+        if ((kingY == rookY2) && (kingX in rookX1..rookX2)) return 3
+        if (kingX != rookX2) return 1
+        return 3
+    }
+    if ((kingX == rookX2) || (kingY == rookY2)) return 2
+    return 0
+}
 
 /**
  * Простая (2 балла)
@@ -130,11 +139,12 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = when {
-    ((kingX == rookX) or (kingY == rookY)) and ((kingX + kingY != bishopX + bishopY) and (kingX - kingY != bishopX - bishopY)) -> 1
-    ((kingX != rookX) and (kingY != rookY)) and ((kingX + kingY == bishopX + bishopY) or (kingX - kingY == bishopX - bishopY)) -> 2
-    ((kingX == rookX) or (kingY == rookY)) and ((kingX + kingY == bishopX + bishopY) or (kingX - kingY == bishopX - bishopY)) -> 3
-    else -> 0
+): Int {
+    return if ((kingX == rookX) || (kingY == rookY))
+        if ((kingX + kingY == bishopX + bishopY) || (kingX - kingY == bishopX - bishopY)) 3
+        else 1
+    else if ((kingX + kingY == bishopX + bishopY) || (kingX - kingY == bishopX - bishopY)) return 2
+    else return 0
 }
 
 /**
@@ -145,13 +155,15 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int =
-    when {
-        (a + b < c) or (a + c < b) or (b + c < a) -> -1
-        (a * a + b * b == c * c) or (a * a == b * b + c * c) or (b * b == a * a + c * c) -> 1
-        (a * a + b * b < c * c) or (a * a > b * b + c * c) or (b * b > a * a + c * c) -> 2
-        else -> 0
-    }
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    if ((a + b < c) || (a + c < b) || (b + c < a)) return -1
+    val aa = a * a
+    val bb = b * b
+    val cc = c * c
+    if ((aa + bb == cc) || (aa == bb + cc) || (bb == aa + cc)) return 1
+    if ((aa + bb < cc) or (aa > bb + cc) or (bb > aa + cc)) return 2
+    return 0
+}
 
 /**
  * Средняя (3 балла)

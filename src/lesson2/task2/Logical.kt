@@ -30,7 +30,7 @@ fun isNumberHappy(number: Int): Boolean =
  * Считать, что ферзи не могут загораживать друг друга.
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
-    (x1 == x2) or (y1 == y2) or (x1 + y1 == x2 + y2) or (x1 - y1 == x2 - y1)
+    (x1 == x2) || (y1 == y2) || (x1 + y1 == x2 + y2) || (x1 - y1 == x2 - y2)
 
 
 /**
@@ -41,12 +41,11 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int =
     when {
+        ((year % 4) == 0) and (((year % 100) != 0) or ((year % 1000 == 0))) -> 29
+        month == 2 -> 28
         (month < 8) and (month % 2 == 1) -> 31
         (month >= 8) and (month % 2 == 0) -> 31
-        (month in 4..6) and (month % 2 == 0) -> 30
-        (month >= 8) and (month % 2 == 1) -> 30
-        ((year % 4) == 0) and (((year % 100) != 0) or ((year % 1000 == 0))) -> 29
-        else -> 28
+        else -> 30
     }
 
 /**
@@ -59,7 +58,7 @@ fun daysInMonth(month: Int, year: Int): Int =
 fun circleInside(
     x1: Double, y1: Double, r1: Double,
     x2: Double, y2: Double, r2: Double
-): Boolean = r1 + kotlin.math.sqrt((sqr(x2 - x1) + sqr(y2 - y1)) * 1.0) <= r2
+): Boolean = r1 + sqrt((sqr(x2 - x1) + sqr(y2 - y1)) * 1.0) <= r2
 
 /**
  * Средняя (3 балла)
