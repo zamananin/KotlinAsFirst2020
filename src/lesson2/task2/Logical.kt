@@ -4,6 +4,9 @@ package lesson2.task2
 
 import lesson1.task1.sqr
 import java.lang.Math.sqrt
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Пример
@@ -30,7 +33,7 @@ fun isNumberHappy(number: Int): Boolean =
  * Считать, что ферзи не могут загораживать друг друга.
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
-    (x1 == x2) || (y1 == y2) || (x1 + y1 == x2 + y2) || (x1 - y1 == x2 - y2)
+    (x1 == x2) || (y1 == y2) || (abs(x1 - x2) == abs(y1 - y2))
 
 
 /**
@@ -41,10 +44,10 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int =
     when {
-        ((year % 4) == 0) and (((year % 100) != 0) or ((year % 1000 == 0))) -> 29
+        (month == 2) && (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0)) -> 29 // не могу понять, что здесь можно упростить
         month == 2 -> 28
-        (month < 8) and (month % 2 == 1) -> 31
-        (month >= 8) and (month % 2 == 0) -> 31
+        (month < 8) && (month % 2 == 1) -> 31
+        (month >= 8) && (month % 2 == 0) -> 31
         else -> 30
     }
 
@@ -70,16 +73,11 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    var a1 = a
-    var b1 = b
-    var c1 = c
-    if (b1 > a1) a1 = b1.also { b1 = a1 }
-    if (c1 > b1) b1 = c1.also { c1 = b1 }
-    if (b1 > a1) a1 = b1.also { b1 = a1 }
+    val vMin = min(a, min(b, c))
+    val vMid = // использовал аналогичное решение, возможно вы имели ввиду какую-то еще функцию их math
+        if (a == vMin) min(b, c)
+        else max(min(a, b), min(a, c))
+    // использовал аналогичное решение, возможно вы имели ввиду какую-то еще функцию их math
 
-    var r1 = r
-    var s1 = s
-    if (s1 > r1) r1 = s1.also { s1 = r1 }
-
-    return ((b1 <= r1) && (c1 <= s1))
+    return (vMin <= min(r, s)) && (vMid <= max(r, s))
 }

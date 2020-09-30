@@ -3,8 +3,11 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.math.abs
 
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
 // Максимальное количество баллов = 6
@@ -110,20 +113,27 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int {
-    if (kingX == rookX1) {
-        if ((kingX == rookX2) && (kingY in rookY1..rookY2)) return 3
-        if (kingY != rookY2) return 1
-        return 3
+): Int = when {
+    (kingX == rookX1) -> when {
+        ((kingX == rookX2) && (kingY in min(rookY1, rookY2)..max(rookY1, rookY2))) -> 3
+        (kingY != rookY2) -> 1
+        else -> 3
     }
-    if (kingY == rookY1) {
-        if ((kingY == rookY2) && (kingX in rookX1..rookX2)) return 3
-        if (kingX != rookX2) return 1
-        return 3
+    (kingY == rookY1) -> when {
+        ((kingY == rookY2) && (kingX in min(rookX1, rookX2)..max(rookX1, rookX2))) -> 3
+        (kingX != rookX2) -> 1
+        else -> 3
     }
-    if ((kingX == rookX2) || (kingY == rookY2)) return 2
-    return 0
+    ((kingX == rookX2) || (kingY == rookY2)) -> 2
+    else -> 0
 }
+/**
+ * исправил каскады if на when
+ * в прошлом варианте получилось хуже, когда я испавил некоторые ошибки,которые тесты редко проверяют
+ * которые тесты редко проверяют:
+ *     assertEquals(3, whichRookThreatens(5, 5, 1, 5, 7, 5))
+ *     assertEquals(3, whichRookThreatens(5, 5, 8, 5, 1, 5))
+ */
 
 /**
  * Простая (2 балла)
@@ -139,13 +149,17 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int {
-    return if ((kingX == rookX) || (kingY == rookY))
-        if ((kingX + kingY == bishopX + bishopY) || (kingX - kingY == bishopX - bishopY)) 3
+): Int = when {
+    ((kingX == rookX) || (kingY == rookY)) ->
+        if (abs(kingX - bishopX) == abs(kingY - bishopY)) 3
         else 1
-    else if ((kingX + kingY == bishopX + bishopY) || (kingX - kingY == bishopX - bishopY)) return 2
-    else return 0
+    (abs(kingX - bishopX) == abs(kingY - bishopY)) -> 2
+    else -> 0
 }
+/**
+ * 2 года назад решил подобную задачу, и с тех пор был уверен,
+ * что для проверки диагоналей нужно минимум 2 условия
+ */
 
 /**
  * Простая (2 балла)
@@ -156,12 +170,16 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    if ((a + b < c) || (a + c < b) || (b + c < a)) return -1
-    val aa = a * a
-    val bb = b * b
-    val cc = c * c
-    if ((aa + bb == cc) || (aa == bb + cc) || (bb == aa + cc)) return 1
-    if ((aa + bb < cc) or (aa > bb + cc) or (bb > aa + cc)) return 2
+    val vMax = max(a, max(b, c))
+    val vMin = min(a, min(b, c))
+    val vMid =
+        if (a == vMax) max(b, c)
+        else min(max(a, b), max(a, c))
+    // как оптимизировать это я даже не знаю
+
+    if (vMin + vMid <= vMax) return -1
+    if (sqr(vMin) + sqr(vMid) == sqr(vMax)) return 1
+    if (sqr(vMin) + sqr(vMid) < sqr(vMax)) return 2
     return 0
 }
 
@@ -174,11 +192,5 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
-    when {
-        c > b -> -1
-        d < a -> -1
-        (c in a..b) and (b <= d) -> b - c
-        (d in a..b) and (c <= a) -> d - a
-        (c >= a) and (d <= b) -> d - c
-        else -> b - a
-    }
+    if ((c > b) || (d < a)) -1
+    else min(b, d) - max(a, c)
