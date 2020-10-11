@@ -72,12 +72,13 @@ fun circleInside(
  * кирпич 4 х 4 х 4 пройдёт через отверстие 4 х 4.
  * Вернуть true, если кирпич пройдёт
  */
+fun min3(a: Int, b: Int, c: Int) = min(a, min(b, c))
+fun max3(a: Int, b: Int, c: Int) = max(a, max(b, c))
+fun mid3(a: Int, b: Int, c: Int) = a + b + c - max3(a, b, c) - min3(a, b, c)
+
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val vMin = min(a, min(b, c))
-    val vMid = // использовал аналогичное решение, возможно вы имели ввиду какую-то еще функцию их math
-        if (a == vMin) min(b, c)
-        else max(min(a, b), min(a, c))
-    // использовал аналогичное решение, возможно вы имели ввиду какую-то еще функцию их math
+    val vMin = min3(a, b, c)
+    val vMid = mid3(a, b, c)
 
     return (vMin <= min(r, s)) && (vMid <= max(r, s))
 }

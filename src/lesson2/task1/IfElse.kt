@@ -114,26 +114,12 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int = when {
-    (kingX == rookX1) -> when {
-        ((kingX == rookX2) && (kingY in min(rookY1, rookY2)..max(rookY1, rookY2))) -> 3
-        (kingY != rookY2) -> 1
-        else -> 3
-    }
-    (kingY == rookY1) -> when {
-        ((kingY == rookY2) && (kingX in min(rookX1, rookX2)..max(rookX1, rookX2))) -> 3
-        (kingX != rookX2) -> 1
-        else -> 3
-    }
+    ((kingX == rookX1) || (kingY == rookY1)) ->
+        if ((kingX == rookX2) || (kingY == rookY2)) 3
+        else 1
     ((kingX == rookX2) || (kingY == rookY2)) -> 2
     else -> 0
 }
-/**
- * исправил каскады if на when
- * в прошлом варианте получилось хуже, когда я испавил некоторые ошибки,которые тесты редко проверяют
- * которые тесты редко проверяют:
- *     assertEquals(3, whichRookThreatens(5, 5, 1, 5, 7, 5))
- *     assertEquals(3, whichRookThreatens(5, 5, 8, 5, 1, 5))
- */
 
 /**
  * Простая (2 балла)
@@ -169,18 +155,20 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int {
-    val vMax = max(a, max(b, c))
-    val vMin = min(a, min(b, c))
-    val vMid =
-        if (a == vMax) max(b, c)
-        else min(max(a, b), max(a, c))
-    // как оптимизировать это я даже не знаю
+fun min3(a: Double, b: Double, c: Double) = min(a, min(b, c))
+fun max3(a: Double, b: Double, c: Double) = max(a, max(b, c))
+fun mid3(a: Double, b: Double, c: Double) = a + b + c - max3(a, b, c) - min3(a, b, c)
 
-    if (vMin + vMid <= vMax) return -1
-    if (sqr(vMin) + sqr(vMid) == sqr(vMax)) return 1
-    if (sqr(vMin) + sqr(vMid) < sqr(vMax)) return 2
-    return 0
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val vMax = max3(a, b, c)
+    val vMin = min3(a, b, c)
+    val vMid = mid3(a, b, c)
+    return when {
+        (vMin + vMid <= vMax) -> -1
+        (sqr(vMin) + sqr(vMid) == sqr(vMax)) -> 1
+        (sqr(vMin) + sqr(vMid) < sqr(vMax)) -> 2
+        else -> 0
+    }
 }
 
 /**

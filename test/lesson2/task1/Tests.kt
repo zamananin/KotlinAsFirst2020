@@ -57,8 +57,7 @@ class Tests {
         assertEquals(1, whichRookThreatens(5, 3, 7, 3, 4, 8))
         assertEquals(2, whichRookThreatens(6, 8, 8, 6, 6, 3))
         assertEquals(3, whichRookThreatens(3, 7, 8, 7, 3, 5))
-        assertEquals(3, whichRookThreatens(5, 5, 1, 5, 7, 5))
-        assertEquals(3, whichRookThreatens(5, 5, 8, 5, 1, 5))
+
     }
 
     @Test
