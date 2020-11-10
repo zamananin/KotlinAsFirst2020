@@ -3,8 +3,10 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.math.pow
+import kotlin.math.min
 import kotlin.math.max
 
 // Урок 3: циклы
@@ -76,7 +78,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int = when {
-    (n < 10) -> 1
+    (abs(n) < 10) -> 1
     else -> digitNumber(n / 10) + 1
 }
 
@@ -118,12 +120,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    for (d in n / 2 downTo 1) {
-        if ((n % d) == 0) return d
-    }
-    return 1
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая (2 балла)
@@ -144,7 +141,7 @@ fun maxDivisor(n: Int): Int {
 fun collatzSteps(x: Int): Int {
     var count = 0
     var a = x
-    while (a != 1){
+    while (a != 1) {
         if (a % 2 == 0) a /= 2
         else a = a * 3 + 1
         count++
@@ -159,11 +156,11 @@ fun collatzSteps(x: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 
-fun lcm(m: Int, n: Int): Int {
-    var c = max(m, n)
-    while ((c % m > 0) || (c % n > 0)) c++
-    return c
-}
+fun gcf(m: Int, n: Int): Int =
+    if (min(m, n) == 0) max(m, n)
+    else gcf(max(m, n) % min(m, n), min(m, n))
+
+fun lcm(m: Int, n: Int): Int = m * n / gcf(m, n)
 
 /**
  * Средняя (3 балла)
@@ -172,7 +169,7 @@ fun lcm(m: Int, n: Int): Int {
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean = lcm(m, n) == 1
+fun isCoPrime(m: Int, n: Int): Boolean = gcf(m, n) == 1
 
 /**
  * Средняя (3 балла)
@@ -196,7 +193,7 @@ fun revert(n: Int): Int {
     var num = n
     while (num > 0) {
         rev *= 10
-        rev += n % 10
+        rev += num % 10
         num /= 10
     }
     return rev
@@ -224,10 +221,10 @@ fun isPalindrome(n: Int): Boolean = revert(n) == n
 fun hasDifferentDigits(n: Int): Boolean {
     var num = n
     while (num > 9) {
-        if ((num % 10) != (num / 10 % 10)) return false
+        if ((num % 10) != (num / 10 % 10)) return true
         num /= 10
     }
-    return true
+    return false
 }
 
 /**
@@ -261,6 +258,10 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
+fun toReturn(count: Int, n: Int, param: Int): Int =
+    if (count == n) param % 10
+    else (param / 10.0.pow(count - n) % 10).toInt()
+
 fun squareSequenceDigit(n: Int): Int {
     var count = 0
     var sq = 0
@@ -268,8 +269,7 @@ fun squareSequenceDigit(n: Int): Int {
         sq++
         count += digitNumber(sq * sq)
     } while (count < n)
-    if (count == n) return (sq * sq) % 10
-    return ((sq * sq) / (10.0.pow(count - n)) % 10).toInt()
+    return toReturn(count, n, sq * sq)
 }
 
 /**
@@ -290,6 +290,5 @@ fun fibSequenceDigit(n: Int): Int {
         a = b.also { b += a }
         count += digitNumber(b)
     } while (count < n)
-    if (count == n) return b % 10
-    return (b / (10.0.pow(count - n)) % 10).toInt()
+    return toReturn(count, n, b)
 }

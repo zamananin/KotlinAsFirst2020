@@ -3,6 +3,9 @@
 package lesson2.task2
 
 import lesson1.task1.sqr
+import lesson2.task1.mid3
+import lesson2.task1.min3
+import lesson2.task2.*
 import java.lang.Math.sqrt
 import kotlin.math.abs
 import kotlin.math.max
@@ -72,13 +75,10 @@ fun circleInside(
  * кирпич 4 х 4 х 4 пройдёт через отверстие 4 х 4.
  * Вернуть true, если кирпич пройдёт
  */
-fun min3(a: Int, b: Int, c: Int) = min(a, min(b, c))
-fun max3(a: Int, b: Int, c: Int) = max(a, max(b, c))
-fun mid3(a: Int, b: Int, c: Int) = a + b + c - max3(a, b, c) - min3(a, b, c)
 
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val vMin = min3(a, b, c)
-    val vMid = mid3(a, b, c)
+    val vMin = min3(a.toDouble(), b.toDouble(), c.toDouble()).toInt()
+    val vMid = mid3(a.toDouble(), b.toDouble(), c.toDouble()).toInt()
 
     return (vMin <= min(r, s)) && (vMid <= max(r, s))
 }
