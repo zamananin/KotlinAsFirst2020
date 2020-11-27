@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import  lesson2.task2.daysInMonth
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -74,7 +76,28 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+val months = listOf(
+    "января", "февраля", "марта",
+    "апреля", "мая", "июня",
+    "июля", "августа", "сентября",
+    "октября", "ноября", "декабря"
+)
+
+fun dateStrToDigit(str: String): String {
+    val list = str.split(" ").toList()
+
+    if ((list.size == 3) &&
+        (list[1] in months) &&
+        (list[2].toIntOrNull() ?: -1 > 0) &&
+        (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(months.indexOf(list[1]) + 1, list[2].toInt()))
+    ) {
+        val d = (list[0].toInt())
+        val m = (months.indexOf(list[1]) + 1)
+        val y = (list[2].toInt())
+        return "%02d.%02d.%d".format(d, m, y)
+    }
+    return ""
+}
 
 /**
  * Средняя (4 балла)
@@ -86,7 +109,20 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val list = digital.split(".")
+    if ((list.size == 3) &&
+        (list[1].toIntOrNull() in 1..12) &&
+        (list[2].toIntOrNull() ?: -1 > 0) &&
+        (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(list[1].toInt(), list[2].toInt()))
+    ) {
+        val d = list[0].toInt()
+        val m = months.getOrNull(list[1].toInt() - 1)
+        val y = list[2].toInt()
+        return "$d $m $y".format(d, y)
+    }
+    return ""
+}
 
 /**
  * Средняя (4 балла)

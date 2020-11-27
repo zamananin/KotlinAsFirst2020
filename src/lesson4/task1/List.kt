@@ -4,7 +4,6 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
-import kotlin.math.log
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -143,6 +142,7 @@ fun mean(list: List<Double>): Double = TODO()
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
+    if (list.size == 0) return mutableListOf()
     val s = list.sum() / list.size
     for (i in 0 until list.size) list[i] -= s
     return list
@@ -211,10 +211,8 @@ fun convert(n: Int, base: Int): List<Int> {
         list.add(x % base)
         x /= base
     }
-    val size = list.size - 1
-    for (i in size / 2 downTo 0)
-        list[i] = list[size - i].also { list[size - i] = list[i] }
-    return list.toList()
+    list.reverse()
+    return list
 }
 
 /**
@@ -230,7 +228,9 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun intToString(x: Int): String =
     if (x < 10) x.toString()
-    else (87 + x).toByte().toChar().toString()
+    else literNot(x).toString()
+
+fun literNot(x: Int) = 'a' + x - 10
 
 fun convertToString(n: Int, base: Int): String {
     val list = convert(n, base)
@@ -270,41 +270,26 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
+val romanChar = listOf('I', 'V', 'X', 'L', 'C', 'D', 'M')
 fun addition(n: Int, one: Char, five: Char, ten: Char): String {
+    if (n == 4) return "$one$five"
+    if (n == 9) return "$one$ten"
+
     var str = ""
-    if (n == 4) {
-        str += one
-        str += five
-        return str
-    }
-    if (n == 9) {
-        str += one
-        str += ten
-        return str
-    }
     if (n in 5..8) str += five
     if (n % 5 in 1..3) for (i in 1..n % 5) str += one
     return str
 }
 
-fun roman(n: Int): String {
-    var x = n
-    var str = ""
-    if (x >= 1000) {
-        str += addition(x / 1000, 'M', ' ', ' ')
-        x %= 1000
-    }
-    if (x >= 100) {
-        str += addition(x / 100, 'C', 'D', 'M')
-        x %= 100
-    }
-    if (x >= 10) {
-        str += addition(x / 10, 'X', 'L', 'C')
-        x %= 10
-    }
-    if (x >= 1) str += addition(x, 'I', 'V', 'X')
-    return str
+fun romanStep(n: Int, i: Int): String {
+    if (i >= romanChar.size - 1) return addition(n % 10, romanChar[i], ' ', ' ')
+    val rom = addition(n % 10, romanChar[i], romanChar[i + 1], romanChar[i + 2])
+
+    return if (n > 10) romanStep(n / 10, i + 2) + rom
+    else rom
 }
+
+fun roman(n: Int): String = romanStep(n, 0)
 
 /**
  * Очень сложная (7 баллов)

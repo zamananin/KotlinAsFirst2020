@@ -166,7 +166,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
         else (key to item)
     for ((key, item) in mapB)
         if (map[key] == null) map += (key to item)
-    return map.toMap()
+    return map
 }
 
 /**
@@ -301,10 +301,11 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val set = list.toSet()
-    list.forEach {
-        if ((number - it in set) && ((it != number / 2) || (list.indexOf(it) != list.lastIndexOf(it))))
-            return (list.indexOf(it) to list.indexOf(number - it))
+    val map = mutableMapOf<Int, Int>() // <элемент из list, его индекс>
+    list.forEachIndexed { index, i ->
+        if (number - i in map.keys)
+            return (map.getOrDefault(number - i, -1) to index)
+        map += (i to index)
     }
     return (-1 to -1)
 }
