@@ -119,7 +119,7 @@ fun dateDigitToStr(digital: String): String {
         val d = list[0].toInt()
         val m = months.getOrNull(list[1].toInt() - 1)
         val y = list[2].toInt()
-        return "$d $m $y".format(d, y)
+        return "$d $m $y"
     }
     return ""
 }
@@ -150,7 +150,19 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val res = jumps.split(' ')
+    var maxRes = -1
+    res.forEach {
+        if ((it != "-") && (it != "%"))
+            try {
+                if (maxRes < it.toInt()) maxRes = it.toInt()
+            } catch (e: NumberFormatException) {
+                return -1
+            }
+    }
+    return maxRes
+}
 
 /**
  * Сложная (6 баллов)
@@ -174,7 +186,27 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun toIntOrEx(str: String): Int {
+    if (!str.matches(Regex("""[0-9]+""")))
+        throw IllegalArgumentException()
+    return str.toInt()
+}
+
+fun plusMinus(expression: String): Int {
+    val list = expression.split(" ")
+    if (list.size % 2 == 0) throw IllegalArgumentException()
+    var x = toIntOrEx(list[0])
+
+    for (i in 2 until list.size step 2) {
+        val n = toIntOrEx(list[i])
+        when (list[i - 1]) {
+            "+" -> x += n
+            "-" -> x -= n
+            else -> throw IllegalArgumentException()
+        }
+    }
+    return x
+}
 
 /**
  * Сложная (6 баллов)
