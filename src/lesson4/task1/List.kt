@@ -362,8 +362,7 @@ fun russian(n: Int): String {
         x %= 100_000
         if (x >= 20_000) {
             list.add(ten(x / 10_000 % 10))
-            if (x / 1_000 % 10 != 0)
-                list.add(femElementary(x / 1_000 % 10))
+            list.add(femElementary(x / 1_000 % 10))
         } else list.add(femElementary(x / 1_000 % 100))
     }
     x %= 1_000
