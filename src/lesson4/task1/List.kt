@@ -206,6 +206,7 @@ fun factorizeToString(n: Int): String = TODO()
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
+    if (n == 0) return listOf(0)
     var x = n
     val list = mutableListOf<Int>()
     while (x > 0) {
@@ -361,15 +362,17 @@ fun russian(n: Int): String {
         x %= 100_000
         if (x >= 20_000) {
             list.add(ten(x / 10_000 % 10))
-            list.add(femElementary(x / 1_000 % 10))
+            if (x / 1_000 % 10 != 0)
+                list.add(femElementary(x / 1_000 % 10))
         } else list.add(femElementary(x / 1_000 % 100))
     }
     x %= 1_000
-    if (x >= 100) list.add(hundreds(n / 100))
+    if (x >= 100) list.add(hundreds(x / 100))
     x %= 100
     if (x >= 20) {
         list.add(ten(x / 10 % 10))
-        list.add(elementary(x / 1 % 10))
+        if (x % 10 != 0)
+            list.add(elementary(x % 10))
     } else if (x > 0) list.add(elementary(x % 100))
     return list.joinToString(separator = " ")
 }
