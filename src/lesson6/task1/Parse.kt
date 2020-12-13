@@ -85,12 +85,12 @@ val months = listOf(
 
 fun dateStrToDigit(str: String): String {
     val list = str.split(" ").toList()
+    fun checkDate(list: List<String>): Boolean = (list.size == 3) &&
+            (list[1] in months) &&
+            (list[2].toIntOrNull() ?: -1 > 0) &&
+            (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(months.indexOf(list[1]) + 1, list[2].toInt()))
 
-    if ((list.size == 3) &&
-        (list[1] in months) &&
-        (list[2].toIntOrNull() ?: -1 > 0) &&
-        (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(months.indexOf(list[1]) + 1, list[2].toInt()))
-    ) {
+    if (checkDate(list)) {
         val d = (list[0].toInt())
         val m = (months.indexOf(list[1]) + 1)
         val y = (list[2].toInt())
@@ -111,11 +111,12 @@ fun dateStrToDigit(str: String): String {
  */
 fun dateDigitToStr(digital: String): String {
     val list = digital.split(".")
-    if ((list.size == 3) &&
-        (list[1].toIntOrNull() in 1..12) &&
-        (list[2].toIntOrNull() ?: -1 > 0) &&
-        (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(list[1].toInt(), list[2].toInt()))
-    ) {
+    fun checkDate(list: List<String>): Boolean = (list.size == 3) &&
+            (list[1].toIntOrNull() in 1..12) &&
+            (list[2].toIntOrNull() ?: -1 > 0) &&
+            (list[0].toIntOrNull() ?: -1 in 1..daysInMonth(list[1].toInt(), list[2].toInt()))
+
+    if (checkDate(list)) {
         val d = list[0].toInt()
         val m = months.getOrNull(list[1].toInt() - 1)
         val y = list[2].toInt()
@@ -154,12 +155,10 @@ fun bestLongJump(jumps: String): Int {
     val res = jumps.split(' ')
     var maxRes = -1
     res.forEach {
-        if ((it != "-") && (it != "%"))
-            try {
-                if (maxRes < it.toInt()) maxRes = it.toInt()
-            } catch (e: NumberFormatException) {
-                return -1
-            }
+        if ((it != "-") && (it != "%")) {
+            if (!it.matches(Regex("""[0-9]+"""))) return -1
+            if (maxRes < it.toInt()) maxRes = it.toInt()
+        }
     }
     return maxRes
 }
@@ -187,8 +186,7 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun toIntOrEx(str: String): Int {
-    if (!str.matches(Regex("""[0-9]+""")))
-        throw IllegalArgumentException()
+    require(str.matches(Regex("""[0-9]+""")))
     return str.toInt()
 }
 

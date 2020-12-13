@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -63,14 +64,13 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    val outputFile = File(outputName).bufferedWriter()
-    val inputFile = File(inputName)
-    for (line in inputFile.readLines())
-        if (line.isEmpty() || line[0] != '_') {
-            outputFile.write(line)
-            outputFile.newLine()
-        }
-    outputFile.close()
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines())
+            if (line.isEmpty() || line[0] != '_') {
+                it.write(line)
+                it.newLine()
+            }
+    }
 }
 
 /**
@@ -83,17 +83,23 @@ fun deleteMarked(inputName: String, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val inputFile = File(inputName)
     val map = mutableMapOf<String, Int>()
-    substrings.forEach { map += (it to 0) }
-    val set = setOf(substrings.forEach { it.toLowerCase() }.toString())
-    for (string in inputFile.readLines()) {
-        val lowStr = string.toLowerCase()
-        if (lowStr in set) map[string]?.plus(1)
-    }
+    substrings.map { map += (it to 0) }
+    val set = substrings.toSet()
+    for (line in File(inputName).readLines())
+        for (str in set) {
+            var searcher = 0
+            val lowStr = line.toLowerCase()
+            val strFind = str.toLowerCase()
+            var i = lowStr.indexOf(strFind, searcher)
+            while (i != -1) {
+                map[str] = map[str]!! + 1
+                searcher = i + 1
+                i = lowStr.indexOf(strFind, searcher)
+            }
+        }
     return map
 }
-
 
 /**
  * Средняя (12 баллов)
@@ -161,7 +167,34 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val text = mutableListOf<List<String>>()
+    val lengthLines = mutableListOf<Int>()
+    var maxLen = 0
+    for (line in File(inputName).readLines()) {
+        val res = line.trim().split(" ").filter { it != "" }
+        var lenWords = res.fold(0) { preview, it -> preview + it.length }
+        if (lenWords != 0) lenWords += (res.size - 1)
+        lengthLines.add(lenWords)
+        maxLen = max(maxLen, lenWords)
+        if (res.isEmpty()) text.add(listOf("")) else text.add(res)
+    }
+    File(outputName).bufferedWriter().use {
+        for ((index, line) in text.withIndex()) {
+            if (line.size == 1) {
+                it.write(line[0] + "\n")
+                continue
+            }
+            val dif = maxLen - lengthLines[index]
+            val countPosSpaces = line.size - 1
+            val divSpaces = dif / countPosSpaces
+            var modSpaces = dif % countPosSpaces
+            for (i in 0..line.size - 2) {
+                it.write(line[i] + " ".repeat(divSpaces + 1 + if (modSpaces > 0) 1 else 0))
+                modSpaces--
+            }
+            it.write(line.last() + "\n")
+        }
+    }
 }
 
 /**
@@ -299,7 +332,51 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readText().replace("\r", "").trim('\n')
+    val textList = mutableListOf("<html><body>", "<p>")
+    val map = mutableMapOf("**" to null, "*" to null, "~~" to null, "\n\n" to 1)
+    var beginIndex = 0
+    var i = 0
+    fun check(mark: String, tags: Pair<String, String>): Boolean {
+        if (text[i] == mark[0]) {
+            var di = i
+            if (mark.length == 2) if (di < text.length - 1 && text[di + 1] == mark[1]) di += 1 else return false
+            if (mark == "\n\n") while (di < text.length - 1 && text[di + 1] == '\n') di += 1
+            if (i - beginIndex != 0) textList.add(text.substring(beginIndex, i))
+            i = di
+            beginIndex = i + 1
+            if (map[mark] == null) {
+                map[mark] = textList.size
+                textList.add(mark)
+            } else {
+                textList.add(tags.second)
+                textList[map[mark]!!] = tags.first
+                map[mark] = null
+                if (mark == "\n\n") {
+                    map[mark] = textList.size
+                    textList.add("\n\n")
+                }
+            }
+            return true
+        }
+        return false
+    }
+    while (i < text.length) {
+        var flag = check("**", "<b>" to "</b>")
+        if (!flag) flag = check("*", "<i>" to "</i>")
+        if (!flag) flag = check("~~", "<s>" to "</s>")
+        if (!flag) check("\n\n", "<p>" to "</p>")
+        i += 1
+    }
+    textList.add(text.substring(beginIndex, i))
+    val lastP = map["\n\n"]
+    if (lastP != null) {
+        textList[lastP] = "<p>"
+        textList.add("</p>")
+    }
+    textList.add("</body></html>")
+    val res = textList.joinToString(separator = "")
+    File(outputName).bufferedWriter().use { it.write(res) }
 }
 
 /**

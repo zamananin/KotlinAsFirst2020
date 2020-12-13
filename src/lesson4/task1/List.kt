@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import java.lang.StringBuilder
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -236,6 +237,7 @@ fun convertToString(n: Int, base: Int): String {
     val list = convert(n, base)
     val newList = mutableListOf<String>()
     for (el in list) newList.add(intToString(el))
+    
     return newList.joinToString(separator = "")
 }
 
@@ -271,25 +273,25 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 val romanChar = listOf('I', 'V', 'X', 'L', 'C', 'D', 'M')
-fun addition(n: Int, one: Char, five: Char, ten: Char): String {
-    if (n == 4) return "$one$five"
-    if (n == 9) return "$one$ten"
+fun addition(n: Int, one: Char, five: Char, ten: Char): StringBuilder {
+    if (n == 4) return StringBuilder("$one$five")
+    if (n == 9) return StringBuilder("$one$ten")
 
-    var str = ""
-    if (n in 5..8) str += five
-    if (n % 5 in 1..3) for (i in 1..n % 5) str += one
+    val str = StringBuilder()
+    if (n in 5..8) str.append(five)
+    if (n % 5 in 1..3) for (i in 1..n % 5) str.append(one)
     return str
 }
 
-fun romanStep(n: Int, i: Int): String {
+fun romanStep(n: Int, i: Int): StringBuilder {
     if (i >= romanChar.size - 1) return addition(n % 10, romanChar[i], ' ', ' ')
     val rom = addition(n % 10, romanChar[i], romanChar[i + 1], romanChar[i + 2])
 
-    return if (n > 10) romanStep(n / 10, i + 2) + rom
+    return if (n >= 10) romanStep(n / 10, i + 2).append(rom)
     else rom
 }
 
-fun roman(n: Int): String = romanStep(n, 0)
+fun roman(n: Int): String = romanStep(n, 0).toString()
 
 /**
  * Очень сложная (7 баллов)
