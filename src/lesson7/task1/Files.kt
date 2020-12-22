@@ -534,9 +534,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
         fun subtract() {
             val k = left - left % rhv
-            val space1 = " ".repeat(pointer - max(length(k) + 1, length(lhv) - 4))
+            val space1 = " ".repeat(pointer - max(length(k), length(left) - 1) - 1)
             //здесь min для случая, когда подчеркивается "-0"
-            val line = "-".repeat(max(length(k) + 1, length(lhv) - 4))
+            val line = "-".repeat(max(length(k) + 1, length(left)))
 
             it.write("$space1$line")                            //черта
             it.newLine()
@@ -594,5 +594,5 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 }
 
 fun main() {
-    printDivisionProcess(25914786, 8385, "temp.txt")
+    printDivisionProcess(300000, 1000, "temp.txt")
 }
