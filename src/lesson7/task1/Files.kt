@@ -542,7 +542,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             it.newLine()
 
             left %= rhv                                             //остаток = разность
-            if (right != 0) {
+            if (pointer <= length) {
                 //на последнем шаге нельзя changeLR, т.к. right = 0
                 changeLR()
 
@@ -594,5 +594,5 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 }
 
 fun main() {
-    printDivisionProcess(256, 5, "temp.txt")
+    printDivisionProcess(3000, 10, "temp.txt")
 }
