@@ -581,12 +581,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             subtract()
             it.newLine()
 
-            do {
+            while (pointer <= length + 1) {
                 subtrahend()
                 it.newLine()
                 subtract()
                 it.newLine()
-            } while (pointer <= length + 1)
+            }
             //основной цикл заканчивается, когда указатель попадает на последний разряд
         }
 
@@ -594,5 +594,5 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 }
 
 fun main() {
-    printDivisionProcess(99999, 1, "temp.txt")
+    printDivisionProcess(256, 5, "temp.txt")
 }
