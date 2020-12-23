@@ -523,18 +523,23 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         right %= power
         pointer++                                                   //учитываем работу указателя
     }
+    if (lhv >= rhv)
+        while (left < rhv) changeLR()
+    val preSpace = if (length(left - left % rhv) == length(left)) 1
+    else 0
+    //проверка на отступ для минуса
 
     File(outputName).bufferedWriter().use {
         fun subtrahend() {
             val k = left - left % rhv                               //целая часть * rhv
-            val space = " ".repeat(pointer - length(k) - 1)
+            val space = " ".repeat(pointer - length(k) - 2 + preSpace)
 
             it.write("$space-$k")
         }
 
         fun subtract() {
             val k = left - left % rhv
-            val space1 = " ".repeat(pointer - max(length(k), length(left) - 1) - 1)
+            val space1 = " ".repeat(pointer - max(length(k), length(left) - 1) - 2 + preSpace)
             //здесь min для случая, когда подчеркивается "-0"
             val line = "-".repeat(max(length(k) + 1, length(left)))
 
@@ -548,32 +553,41 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
                 if (left > 9) {
                     //нужно прописывать нуль перед числом
-                    val space2 = " ".repeat(pointer - length(left))
+                    val space2 = " ".repeat(pointer - length(left) - 1 + preSpace)
                     it.write("$space2$left")
 
                 } else {
-                    val space2 = " ".repeat(pointer - length(left) - 1) + "0"
+                    val space2 = " ".repeat(pointer - length(left) - 2 + preSpace) + "0"
                     it.write("$space2$left")
                 }
             } else {
                 pointer++
-                val space2 = " ".repeat(pointer - length(left) - 1)
+                val space2 = " ".repeat(pointer - length(left) - 2 + preSpace)
                 it.write("$space2$left")
             }
         }
 
-        it.write(" $lhv | $rhv")
-        it.newLine()
-
         if (lhv < rhv) {                                            //критический случай
-            it.write(" ".repeat(length - 1) + "-0   0")
+            if (length == 1) it.write(" ")
+            it.write("$lhv | $rhv")
             it.newLine()
-            if (lhv < 10) it.write("--")                        //нужно ли подчеркивать первый символ строки
-            else it.write(" " + "-".repeat(length))
+
+            if (length == 1) it.write("-0   0")
+            else it.write(" ".repeat(length - 2) + "-0   0")
             it.newLine()
-            it.write(" $lhv")
+
+            if (length <= 2) it.write("--")                        //нужно ли подчеркивать первый символ строки
+            else it.write("-".repeat(length))
+            it.newLine()
+
+            if (length == 1) it.write(" ")
+            it.write("$lhv")
         } else {
-            while (left < rhv) changeLR()                           //первый шаг
+            //первый шаг
+            if (preSpace == 1) it.write(" $lhv | $rhv")
+            else it.write("$lhv | $rhv")
+            it.newLine()
+
             subtrahend()
             it.write(" ".repeat(length - pointer + 4) + lhv / rhv)
             it.newLine()
@@ -594,5 +608,5 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 }
 
 fun main() {
-    printDivisionProcess(300000, 1000, "temp.txt")
+    printDivisionProcess(1000, 90, "temp.txt")
 }
