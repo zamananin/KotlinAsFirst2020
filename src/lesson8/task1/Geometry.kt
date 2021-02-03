@@ -134,10 +134,7 @@ fun farPoint(mainPoint: Point, points: List<Point>): Point {
 }
 
 fun diameter(vararg points: Point): Segment {
-    require(points.size >= 2)
-    val a = farPoint(points[0], points.toList())
-    val b = farPoint(a, points.toList())
-    return Segment(a, b)
+    TODO()
 }
 
 /**
@@ -241,11 +238,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> = TODO()
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
-    val center = bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c))
-    return Circle(
-        center,
-        center.distance(a)
-    )
+    TODO()
 }
 
 /**
