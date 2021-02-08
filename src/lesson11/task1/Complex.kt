@@ -72,10 +72,13 @@ class Complex(val re: Double, val im: Double) {
     /**
      * Деление
      */
-    operator fun div(other: Complex) = Complex(
-        (re * other.re + im * other.im) / (other.re * other.re + other.im * other.im),
-        (other.re * im - re * other.im) / (other.re * other.re + other.im * other.im)
-    )
+    operator fun div(other: Complex): Complex {
+        require(other != Complex("0")) { "/ by zero" }
+        return Complex(
+            (re * other.re + im * other.im) / (other.re * other.re + other.im * other.im),
+            (other.re * im - re * other.im) / (other.re * other.re + other.im * other.im)
+        )
+    }
 
     /**
      * Сравнение на равенство
