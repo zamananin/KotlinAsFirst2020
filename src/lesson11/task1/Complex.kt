@@ -13,16 +13,24 @@ package lesson11.task1
  */
 private fun stringToComplex(s: String): Complex {
     val sFormatted = Regex("""\s""").replace(s, "")
-    require(Regex("""-?\d+(\.\d+)?([-+]\d+(\.\d+)?i)?""").matches(sFormatted)) { "Incorrect format: $s" }
-    return if (Regex("""-?\d+(\.\d+)?""").matches(sFormatted))
-        Complex(sFormatted.toDouble())
-    else {
-        val re = Regex("""-?\d+(\.\d+)?""").find(sFormatted)
-        val lastIndexOfRe = (Regex("""-?\d+(\.\d+)?""").find(sFormatted))!!.range.last
-        val im = Regex("""-?\d+(\.\d+)?""").find(sFormatted, lastIndexOfRe + 1)
-        val reStr = re!!.value
-        val imStr = im!!.value
-        Complex(reStr.toDouble(), imStr.toDouble())
+    require(
+        (sFormatted != "") &&
+                Regex("""(-?\d+(\.\d+)?)?([-+]\d+(\.\d+)?i)?""").matches(sFormatted)
+    ) { "Incorrect format: $s" }
+    return when {
+        Regex("""-?\d+(\.\d+)?""").matches(sFormatted) -> Complex(sFormatted.toDouble())
+        Regex("""-?\d+(\.\d+)?i""").matches(sFormatted) -> Complex(
+            0.0,
+            Regex("""i""").replace(sFormatted, "").toDouble()
+        )
+        else -> {
+            val re = Regex("""-?\d+(\.\d+)?""").find(sFormatted)
+            val lastIndexOfRe = (Regex("""-?\d+(\.\d+)?""").find(sFormatted))!!.range.last
+            val im = Regex("""-?\d+(\.\d+)?""").find(sFormatted, lastIndexOfRe + 1)
+            val reStr = re!!.value
+            val imStr = im!!.value
+            Complex(reStr.toDouble(), imStr.toDouble())
+        }
     }
 
 }

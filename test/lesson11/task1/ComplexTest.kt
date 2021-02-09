@@ -13,6 +13,18 @@ internal class ComplexTest {
     }
 
     @Test
+    fun stringToComplex() {
+        assertEquals(Complex(12.0, 14.0), Complex("12 + 14i"))
+        assertEquals(Complex(12.0, 14.5), Complex("12.0 + 14.5i"))
+        assertEquals(Complex(-12.0, -14.0), Complex("-      12 - 1 4  .00 i"))
+        assertEquals(Complex(0.0, 0.0), Complex("0"))
+        assertEquals(Complex(0.0, 0.0), Complex("-0"))
+        assertEquals(Complex(0.0, -2.0), Complex("-2i"))
+        assertEquals(Complex(0.4, 0.0), Complex("0.4"))
+        assertEquals(Complex(0.0, 0.0), Complex("-0i"))
+    }
+
+    @Test
     @Tag("2")
     fun plus() {
         assertApproxEquals(Complex("4-2i"), Complex("1+2i") + Complex("3-4i"), 1e-10)
