@@ -11,27 +11,33 @@ package lesson11.task1
  *
  * Аргументы конструктора -- вещественная и мнимая часть числа.
  */
-private fun stringToComplex(s: String): Complex {
+fun Complex(s: String): Complex {
     val sFormatted = Regex("""\s""").replace(s, "")
     require(
         (sFormatted != "") &&
                 Regex("""(-?\d+(\.\d+)?)?([-+]\d+(\.\d+)?i)?""").matches(sFormatted)
     ) { "Incorrect format: $s" }
-    return when {
-        Regex("""-?\d+(\.\d+)?""").matches(sFormatted) -> Complex(sFormatted.toDouble())
-        Regex("""-?\d+(\.\d+)?i""").matches(sFormatted) -> Complex(
-            0.0,
-            Regex("""i""").replace(sFormatted, "").toDouble()
-        )
-        else -> {
-            val re = Regex("""-?\d+(\.\d+)?""").find(sFormatted)
-            val lastIndexOfRe = (Regex("""-?\d+(\.\d+)?""").find(sFormatted))!!.range.last
-            val im = Regex("""-?\d+(\.\d+)?""").find(sFormatted, lastIndexOfRe + 1)
-            val reStr = re!!.value
-            val imStr = im!!.value
-            Complex(reStr.toDouble(), imStr.toDouble())
-        }
-    }
+
+    val a = Regex("""(-?\d+(?:\.\d+)?)?([-+]\d+(?:\.\d+)?i)?""").matchEntire(sFormatted)!!.groupValues
+    val re = if (a[1] == "") 0.0 else a[1].toDouble()
+    val im = if (a[2] == "") 0.0 else Regex("i").replace(a[2], "").toDouble()
+    return Complex(re, im)
+
+//    return when {
+//        Regex("""-?\d+(\.\d+)?""").matches(sFormatted) -> Complex(sFormatted.toDouble())
+//        Regex("""-?\d+(\.\d+)?i""").matches(sFormatted) -> Complex(
+//            0.0,
+//            Regex("""i""").replace(sFormatted, "").toDouble()
+//        )
+//        else -> {
+//            val re = Regex("""-?\d+(\.\d+)?""").find(sFormatted)
+//            val lastIndexOfRe = (Regex("""-?\d+(\.\d+)?""").find(sFormatted))!!.range.last
+//            val im = Regex("""-?\d+(\.\d+)?""").find(sFormatted, lastIndexOfRe + 1)
+//            val reStr = re!!.value
+//            val imStr = im!!.value
+//            Complex(reStr.toDouble(), imStr.toDouble())
+//        }
+//    }
 
 }
 
@@ -46,7 +52,7 @@ class Complex(val re: Double, val im: Double) {
      * Конструктор из строки вида x+yi
      */
 
-    constructor(s: String) : this(stringToComplex(s).re, stringToComplex(s).im)
+//    constructor(s: String) : this(stringToComplex(s).re, stringToComplex(s).im)
 
     /**
      * Сложение.
