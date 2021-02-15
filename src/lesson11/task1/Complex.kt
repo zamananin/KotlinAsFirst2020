@@ -13,14 +13,15 @@ package lesson11.task1
  */
 fun Complex(s: String): Complex {
     val sFormatted = Regex("""\s""").replace(s, "")
-    require(
-        (sFormatted != "") &&
-                Regex("""(-?\d+(\.\d+)?)?([-+]\d+(\.\d+)?i)?""").matches(sFormatted)
-    ) { "Incorrect format: $s" }
+//    require(
+//        (sFormatted != "") &&
+//                Regex("""(-?\d+(\.\d+)?)?([-+]\d+(\.\d+)?i)?""").matches(sFormatted)
+//    ) { "Incorrect format: $s" }
 
-    val a = Regex("""(-?\d+(?:\.\d+)?)?([-+]\d+(?:\.\d+)?i)?""").matchEntire(sFormatted)!!.groupValues
+    val a = Regex("""(-?\d+(?:\.\d+)?)?(?:([-+]\d+(?:\.\d+)?)i)?""").matchEntire(sFormatted)?.groupValues
+    if ((a?.get(1) !is String) && (a?.get(2) !is String)) throw Exception("Illegal argument $sFormatted")
     val re = if (a[1] == "") 0.0 else a[1].toDouble()
-    val im = if (a[2] == "") 0.0 else Regex("i").replace(a[2], "").toDouble()
+    val im = if (a[2] == "") 0.0 else a[2].toDouble()
     return Complex(re, im)
 
 //    return when {
@@ -87,7 +88,7 @@ class Complex(val re: Double, val im: Double) {
      * Деление
      */
     operator fun div(other: Complex): Complex {
-        require(other != Complex("0")) { "/ by zero" }
+        require(other != Complex(0.0, 0.0)) { "/ by zero" }
         return Complex(
             (re * other.re + im * other.im) / (other.re * other.re + other.im * other.im),
             (other.re * im - re * other.im) / (other.re * other.re + other.im * other.im)
@@ -98,9 +99,10 @@ class Complex(val re: Double, val im: Double) {
      * Сравнение на равенство
      */
     override fun equals(other: Any?): Boolean =
-        other is Complex && (re == other.re) && (im == other.im)
+        this === other ||
+                other is Complex && (re == other.re) && (im == other.im)
 
-    override fun hashCode() = re.hashCode() + im.hashCode()
+    override fun hashCode() = re.hashCode() * 31 + im.hashCode()
 
     /**
      * Преобразование в строку
