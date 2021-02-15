@@ -57,7 +57,9 @@ internal class PhoneBookTest {
     @Tag("6")
     fun phones() {
         val book = PhoneBook()
+        assertEquals(emptySet<String>(), book.phones("Игорь"))
         assertTrue(book.addHuman("Иванов Петр"))
+        assertEquals(emptySet<String>(), book.phones("Иванов Петр"))
         assertTrue(book.addHuman("Васильев Дмитрий"))
         assertTrue(book.addPhone("Иванов Петр", "+79211234567"))
         assertTrue(book.addPhone("Иванов Петр", "+78121234567"))
