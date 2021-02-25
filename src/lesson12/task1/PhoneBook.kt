@@ -18,20 +18,11 @@ package lesson12.task1
  * Класс должен иметь конструктор по умолчанию (без параметров).
  */
 class PhoneBook {
-    private val people = mutableSetOf<Person>()
+    private val people = mutableMapOf<Person, MutableSet<Phone>>()
+    private val phones = mutableMapOf<Phone, Person>()
 
     class Person(val name: String) {
-        val phones = mutableSetOf<Phone>()
-
-        fun addPhone(phone: String): Boolean {
-            val newPhone = Phone(phone)
-            return if (newPhone in this.phones) false
-            else {
-                this.phones.add(newPhone)
-                true
-            }
-
-        }
+        override fun toString(): String = name
 
         override fun equals(other: Any?): Boolean =
             this === other ||
@@ -57,12 +48,12 @@ class PhoneBook {
         override fun hashCode(): Int = phone.hashCode()
     }
 
-    private fun getPerson(name: String): Person? {
-        for (person in people)
-            if (name == person.name)
-                return person
-        return null
-    }
+//    private fun getPerson(name: String): Person? {
+//        for (person in people)
+//            if (name == person.name)
+//                return person
+//        return null
+//    }
 
     /**
      * Добавить человека.
@@ -73,9 +64,9 @@ class PhoneBook {
     fun addHuman(name: String): Boolean {
         val newPerson = Person(name)
 
-        return if (newPerson in this.people) false
+        return if (newPerson in this.people.keys) false
         else {
-            this.people.add(newPerson)
+            this.people[newPerson] = mutableSetOf()
             true
         }
     }
@@ -88,8 +79,14 @@ class PhoneBook {
      */
     fun removeHuman(name: String): Boolean {
         val newPerson = Person(name)
-        return this.people.remove(newPerson)
-
+        return if (newPerson !in people.keys) false
+        else {
+            people[newPerson]!!.forEach {
+                phones.remove(it)
+            }
+            people.remove(newPerson)
+            true
+        }
     }
 
     /**
@@ -99,8 +96,14 @@ class PhoneBook {
      * либо у него уже был такой номер телефона,
      * либо такой номер телефона зарегистрирован за другим человеком.
      */
-    fun addPhone(name: String, phone: String): Boolean =
-        (humanByPhone(phone) == null) && (getPerson(name)?.addPhone(phone) ?: false)
+    fun addPhone(name: String, phone: String): Boolean {
+        return if (Phone(phone) in phones.keys || Person(name) !in people.keys) false
+        else {
+            phones[Phone(phone)] = Person(name)
+            people[Person(name)]!!.add(Phone(phone))
+            true
+        }
+    }
 
     /**
      * Убрать номер телефона.
@@ -109,8 +112,12 @@ class PhoneBook {
      * либо у него не было такого номера телефона.
      */
     fun removePhone(name: String, phone: String): Boolean {
-        val person = getPerson(name) ?: return false
-        return person.phones.remove(Phone(phone))
+        return if (humanByPhone(phone) != name) false
+        else {
+            people[Person(name)]!!.remove(Phone(phone))
+            phones.remove(Phone(phone), Person(name))
+            true
+        }
     }
 
     /**
@@ -118,32 +125,25 @@ class PhoneBook {
      * Если этого человека нет в книге, вернуть пустой список
      */
     fun phones(name: String): Set<String> =
-        getPerson(name)?.phones?.map { it.toString() }?.toSet() ?: emptySet()
+        people[Person(name)]?.map { it.toString() }?.toSet() ?: emptySet()
 
     /**
      * Вернуть имя человека по заданному номеру телефона.
      * Если такого номера нет в книге, вернуть null.
      */
-    fun humanByPhone(phone: String): String? {
-        for (person in people) {
-            if (Phone(phone) in person.phones) return person.name
-        }
-        return null
-    }
+    fun humanByPhone(phone: String): String? = if (phones[Phone(phone)] == null) null
+    else phones[Phone(phone)].toString()
 
     /**
      * Две телефонные книги равны, если в них хранится одинаковый набор людей,
      * и каждому человеку соответствует одинаковый набор телефонов.
      * Порядок людей / порядок телефонов в книге не должен иметь значения.
      */
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PhoneBook) return false
-        if (people != other.people) return false
-        for (person in people) {
-            if (person.phones != other.getPerson(person.name)!!.phones) return false
-        }
-        return true
+    override fun equals(other: Any?): Boolean = when{
+        this === other -> true
+        other !is PhoneBook -> false
+        phones == other.phones -> true
+        else -> false
     }
 
     override fun hashCode(): Int = people.hashCode()
