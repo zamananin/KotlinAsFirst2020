@@ -68,11 +68,9 @@ class PhoneBook {
      * (во втором случае телефонная книга не должна меняться).
      */
     fun addHuman(name: String): Boolean {
-        val newPerson = Person(name)
-
-        return if (newPerson in people.values) false
+        return if (name in people.keys) false
         else {
-            this.people[name] = newPerson
+            this.people[name] = Person(name)
             true
         }
     }
@@ -83,15 +81,13 @@ class PhoneBook {
      * и false, если человек с таким именем отсутствовал в телефонной книге
      * (во втором случае телефонная книга не должна меняться).
      */
+    // Не положил people[name] в переменную т.к. отказался от проверки в if
     fun removeHuman(name: String): Boolean {
-        return if (name !in people.keys) false
-        else {
-            people[name]!!.phones.forEach {
-                phones.remove(it)
-            }
-            people.remove(name)
-            true
-        }
+        people[name]?.phones?.forEach {
+            phones.remove(it)
+        } ?: return false
+        people.remove(name)
+        return true
     }
 
     /**
@@ -103,12 +99,10 @@ class PhoneBook {
      */
     fun addPhone(name: String, phone: String): Boolean {
         val newPhone = Phone(phone)
-        return if (newPhone in phones.keys || name !in people.keys) false
-        else {
-            phones[newPhone] = Person(name)
-            people[name]!!.addPhone(phone)
-            true
-        }
+        if (newPhone in phones) return false
+        people[name]?.addPhone(phone) ?: return false
+        phones[newPhone] = Person(name)
+        return true
     }
 
     /**
@@ -146,9 +140,11 @@ class PhoneBook {
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is PhoneBook -> false
-        phones == other.phones -> true
+        phones != other.phones -> false
+        people == other.people -> true
         else -> false
     }
 
-    override fun hashCode(): Int = phones.hashCode()
+    override fun hashCode(): Int = people.hashCode() * 31 + phones.hashCode()
+    // И то и другое важно, т.к. Person.equals(other) не учитывает phones внутри себя
 }
